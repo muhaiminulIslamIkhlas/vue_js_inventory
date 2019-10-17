@@ -76,7 +76,7 @@
                       <input type="text" class="form-control" required="" v-model="pay">
 
                       <label>Due</label>
-                      <input type="text" class="form-control" required="" v-model="due">
+                      <input type="text" disabled class="form-control" required="" v-model="due">
 
                       <label>Pay By </label>
                       <select class="form-control" v-model="payby">
@@ -255,7 +255,9 @@
          this.vat();
          Reload.$on('AfterAdd', ()=>{
            this.cartProduct();
-         })
+         });
+
+         
         },
         data(){
           return{
@@ -309,6 +311,10 @@
             return sum;
          },
        },
+       dues(){
+        let total = this.subtotal*this.vats.vat /100 +this.subtotal;
+        due:total-this.pay;
+       },
         methods:{   
           //cart methods here
           AddToCart(id){
@@ -353,12 +359,15 @@
           },
           orderdone(){
             let total = this.subtotal*this.vats.vat /100 +this.subtotal;
-            var data = {qty:this.qty, subtotal:this.subtotal, customer_id:this.customer_id, payby:this.payby, pay:this.pay, due:this.due, vat:this.vats.vat, total:total}
-            axios.post('/api/orderdone/',data)
-            .then(() => {
-               Notification.success()
-               this.$router.push({ name: 'home' })
-            })
+            if(this.pay > total){
+                Notification.error()
+            }else{
+              var data = {qty:this.qty, subtotal:this.subtotal, customer_id:this.customer_id, payby:this.payby, pay:this.pay, due:total-this.pay, vat:this.vats.vat, total:total}
+                axios.post('/api/orderdone/',data)
+                Notification.success()
+                this.$router.push({ name: 'home' })
+            }
+              
           },
           //end cart methods
           allProduct(){

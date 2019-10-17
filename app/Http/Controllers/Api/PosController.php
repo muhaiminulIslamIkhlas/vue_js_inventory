@@ -50,4 +50,32 @@ class PosController extends Controller
          DB::table('pos')->delete();
          return response('done');
     }
+
+    public function TodaySell(){
+        $date=date('d/m/Y');
+        $sell=DB::table('order')->where('order_date',$date)->sum('total');
+        return response()->json($sell);
+    }
+
+    public function TodayCollection(){
+        $date=date('d/m/Y');
+        $collection=DB::table('order')->where('order_date',$date)->sum('pay');
+        return response()->json($collection);
+    }
+     public function TodayDue(){
+        $date=date('d/m/Y');
+        $due=DB::table('order')->where('order_date',$date)->sum('due');
+        return response()->json($due);
+    }
+
+   public function TodayExpense(){
+        $date=date('d/m/Y');
+        $due=DB::table('expenses')->where('expense_date',$date)->sum('amount');
+        return response()->json($due);
+    }
+
+      public function StockOut(){
+        $due=DB::table('products')->where('product_quantity','<','1')->get();
+        return response()->json($due);
+    }
 }
